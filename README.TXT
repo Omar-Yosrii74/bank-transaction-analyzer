@@ -12,6 +12,7 @@ A professional Python-based financial tool designed to analyze bank transactions
 * **Time-Series Tracking:** Groups expenditures by month to monitor spending trends.
 * **Data Visualization:** Plots expenses using **Matplotlib** (Pie Charts).
 * **Report Generation:** Exports final analysis summaries back into CSV format.
+* **Budget Tracking:** Set budgets per category and receive warnings when expenses exceed limits.
 
 ---
 
@@ -42,7 +43,7 @@ The project follows a modular structure for better maintainability:
     ```bash
     python main.py
     ```
-3.  **Navigate Menu:** Use options **1-6** to explore statistics, OOP objects, monthly trends, and charts.
+3.  **Navigate Menu:** Use options **1-8** to explore statistics, OOP objects, monthly trends, charts, and budget management.
 
 ---
 

@@ -37,13 +37,15 @@ if __name__ == "__main__":
             print("3. View monthly spending")
             print("4. Spending by category")
             print("5. Export Summary Report to CSV")
-            print("6. Exit")
+            print("6. Set Budget for Category")
+            print("7. View Budget Status")
+            print("8. Exit")
             print("="*45)
 
             try:
-                choice = int(input("\nEnter your choice (1-6): "))
+                choice = int(input("\nEnter your choice (1-8): "))
             except ValueError:
-                print("\nInvalid input! Please enter a number between 1 and 6.")
+                print("\nInvalid input! Please enter a number between 1 and 8.")
                 continue
 
             if choice == 1:
@@ -89,11 +91,67 @@ if __name__ == "__main__":
                 print("\n✅ Success: Report saved as 'spending_summary_report.csv'")
 
             elif choice == 6:
+                print("\n--- Set Budget for Category ---\n")
+                # Get available categories from the data
+                categories = list(my_app.get_expenditure_by_category().keys())
+                if categories:
+                    print("Available categories:")
+                    for i, cat in enumerate(categories, 1):
+                        print(f"{i}. {cat}")
+                    
+                    try:
+                        cat_choice = int(input(f"\nSelect category (1-{len(categories)}): "))
+                        if 1 <= cat_choice <= len(categories):
+                            selected_category = categories[cat_choice - 1]
+                            budget_amount = float(input(f"Enter budget amount for {selected_category}: "))
+                            if my_app.set_budget(selected_category, budget_amount):
+                                print(f"\n✅ Budget set: {selected_category} = {budget_amount:,.2f} EGP")
+                            else:
+                                print("\n❌ Invalid budget amount. Must be greater than 0.")
+                        else:
+                            print(f"\n❌ Invalid choice. Please select 1-{len(categories)}.")
+                    except ValueError:
+                        print("\n❌ Invalid input. Please enter valid numbers.")
+                else:
+                    print("No categories found in data.")
+
+            elif choice == 7:
+                print("\n--- Budget Status Report ---\n")
+                budget_status = my_app.get_budget_status()
+                
+                if not budget_status:
+                    print("No budgets have been set yet.")
+                    print("Use option 6 to set budgets for categories.")
+                else:
+                    warnings = []
+                    for category, status in budget_status.items():
+                        print(f"\n{category}:")
+                        print(f"  Budget:    {status['budget']:,.2f} EGP")
+                        print(f"  Spent:     {status['spent']:,.2f} EGP")
+                        print(f"  Remaining: {status['remaining']:,.2f} EGP")
+                        print(f"  Usage:     {status['percentage']:.1f}%")
+                        
+                        if status['over_budget']:
+                            overspent = abs(status['remaining'])
+                            warning_msg = f"⚠️  WARNING: {category} is over budget by {overspent:,.2f} EGP!"
+                            print(f"  {warning_msg}")
+                            warnings.append(warning_msg)
+                        elif status['percentage'] >= 80:
+                            print(f"  ⚡ Alert: Approaching budget limit!")
+                    
+                    if warnings:
+                        print("\n" + "="*45)
+                        print("BUDGET WARNINGS:")
+                        print("="*45)
+                        for warning in warnings:
+                            print(warning)
+
+            elif choice == 8:
                 print("\nThank you for using  THE TRANSACTION ANALYZER. Goodbye!\n")
                 break
 
             else:
-                print("\nInvalid choice. Please select 1-6.")
+                print("\nInvalid choice. Please select 1-8.")
     else:
         print("\nNo transaction data found.")
         print("Please check that the data file exists, then restart the app.")
