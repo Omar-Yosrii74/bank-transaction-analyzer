@@ -10,6 +10,7 @@ class BankAnalyzer:
     def __init__(self, file_path):
         self.file_path = file_path
         self.data = None
+        self.budgets = {}
 
     def load_data(self):
         try:
@@ -46,5 +47,36 @@ class BankAnalyzer:
             top_expenses_df = self.data.nlargest(n, 'Amount')
             return [Transaction(row['Category'], row['Amount']) for index, row in top_expenses_df.iterrows()]
         return []
+
+    def set_budget(self, category, amount):
+        """Set a budget for a specific category"""
+        if amount > 0:
+            self.budgets[category] = amount
+            return True
+        return False
+
+    def get_budget_status(self):
+        """Check spending vs budgets and generate warnings"""
+        if self.data is None:
+            return {}
+        
+        category_spending = self.get_expenditure_by_category()
+        budget_status = {}
+        
+        for category, budget in self.budgets.items():
+            spent = category_spending.get(category, 0)
+            remaining = budget - spent
+            over_budget = spent > budget
+            percentage = (spent / budget * 100) if budget > 0 else 0
+            
+            budget_status[category] = {
+                'budget': budget,
+                'spent': spent,
+                'remaining': remaining,
+                'over_budget': over_budget,
+                'percentage': percentage
+            }
+        
+        return budget_status
     
     
